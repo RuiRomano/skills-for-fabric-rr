@@ -74,11 +74,38 @@ Use the shared mechanics in [COMMON-CLI.md § Item CRUD Operations](../../../com
 
 | Operation | Endpoint | Method | Scopes | Notes |
 |---|---|---|---|---|
-| Create | `/v1/workspaces/{workspaceId}/reflexes` | POST | `Reflex.ReadWrite.All` or `Item.ReadWrite.All` | May return 202 LRO — use `fabric_lro` from COMMON-CLI |
+| Create | `/v1/workspaces/{workspaceId}/reflexes` | POST | `Reflex.ReadWrite.All` or `Item.ReadWrite.All` | Body **must** use `displayName` (see below). May return 202 LRO — use `fabric_lro` from COMMON-CLI |
 | Update metadata | `/v1/workspaces/{workspaceId}/reflexes/{reflexId}` | PATCH | `Reflex.ReadWrite.All` or `Item.ReadWrite.All` | Follow COMMON-CLI metadata update pattern |
 | Delete | `/v1/workspaces/{workspaceId}/reflexes/{reflexId}` | DELETE | `Reflex.ReadWrite.All` or `Item.ReadWrite.All` | Add `?hardDelete=true` for permanent deletion |
 | `getDefinition` | `/v1/workspaces/{workspaceId}/reflexes/{reflexId}/getDefinition` | POST | `Reflex.ReadWrite.All` or `Item.ReadWrite.All` | Empty body required; may return 202 LRO — use `fabric_lro` |
 | `updateDefinition` | `/v1/workspaces/{workspaceId}/reflexes/{reflexId}/updateDefinition` | POST | `Reflex.ReadWrite.All` or `Item.ReadWrite.All` | Use Python to build `update-body.json`, then follow COMMON-CLI updateDefinition pattern |
+
+### Create — Request Body
+
+The item envelope uses **`displayName`**, not `name`. Omitting it fails with HTTP 400 `DisplayName field is required`.
+
+```bash
+az rest --method post \
+  --url "https://api.fabric.microsoft.com/v1/workspaces/${WS_ID}/reflexes" \
+  --resource "https://api.fabric.microsoft.com" \
+  --headers "Content-Type=application/json" \
+  --body '{"displayName":"MyActivator","description":"Alerts on order volume"}'
+```
+
+> **`displayName` vs `name` — the two are not interchangeable.**
+> `displayName` belongs to the **item envelope** (create and update-metadata bodies). `name` appears only **inside** `ReflexEntities.json` entity objects — rules, bindings, data sources, and action arguments — which is why `"name"` is by far the more common key in the rest of this skill. Do not carry it over to the create body.
+
+In PowerShell, do **not** inline the JSON: the quoting is mangled before Fabric sees it and the create fails with `InvalidInput` / `Unexpected character encountered while parsing value`. Write the body to a file first, and always send `Content-Type` or the call fails with `UnsupportedMediaType`.
+
+```powershell
+'{"displayName":"MyActivator","description":"Alerts on order volume"}' |
+  Set-Content -Path "$env:TEMP\create-reflex-body.json" -Encoding utf8
+az rest --method post `
+  --url "https://api.fabric.microsoft.com/v1/workspaces/$WS_ID/reflexes" `
+  --resource "https://api.fabric.microsoft.com" `
+  --headers "Content-Type=application/json" `
+  --body "@$env:TEMP\create-reflex-body.json"
+```
 
 ---
 
@@ -131,6 +158,8 @@ Build a JSON array of entities in order. Each needs a fresh GUID for `uniqueIden
   - Create an **Object** view
   - Optionally create **SplitEvent** if events must be mapped to object instances
   - Create **IdentityPartAttribute** and any required **BasicEventAttribute** entities
+  - One attribute entity **per source field**, and each entity's name must be unique in the graph. `IdentityPartAttribute` already covers the identity field (for example `DeviceId`) — do not add a second `BasicEventAttribute` with that same name
+  - When you clone an existing attribute entity to add another (the fastest way to reuse a service-accepted envelope), update **both** the payload `name` **and** the `EventFieldSelector` `fieldName` to the new field. Cloning `Temperature` and renaming only the payload leaves every copy still selecting `Temperature`, which the service accepts silently and which makes the rule read the wrong column
   - The rule then references those value attributes in `ScalarSelectStep`
 
 - **For `EventTrigger` rules** (fire on every event, heartbeat, event field state/change):
@@ -175,6 +204,22 @@ Example rule entity:
 **Step 6 — Fabric Item Action** (only for `FabricItemInvocation`):
 - Type: `fabricItemAction-v1` — use this standalone action entity whenever the rule invokes a Fabric item such as a Pipeline, Notebook, Spark job definition, Dataflow, or UDF / Function Set
 - In the rule's `FabricItemBinding`, set `fabricJobConnectionDocumentId` to the standalone `fabricItemAction-v1.uniqueIdentifier`
+- The target is carried in **`payload.fabricItem`** — **not** `targetItem`, and the ids are not siblings of `jobType`:
+
+```json
+{
+  "uniqueIdentifier": "<action-guid>",
+  "payload": {
+    "name": "Run alert notebook",
+    "fabricItem": { "itemId": "<item-guid>", "workspaceId": "<workspace-guid>", "itemType": "SynapseNotebook" },
+    "jobType": "RunNotebook",
+    "parentContainer": { "targetUniqueIdentifier": "<container-guid>" }
+  },
+  "type": "fabricItemAction-v1"
+}
+```
+
+- `itemType` / `jobType` pairs: `SynapseNotebook`/`RunNotebook`, `SparkJobDefinition`/`sparkjob`, `DataflowFabric`/`Execute`, `UserDataFunctions`/`Execute`, `Pipeline`/`Pipeline`
 - See [action-types.md](authoring/action-types.md) for per-target schemas and UDF-specific gotchas (`itemType` vs readback `FunctionSet`, `subitemId`, canonical `parameterType` mapping, dynamic parameter shape)
 
 ### Reference Integrity Preflight
@@ -302,6 +347,10 @@ Treat **schema-only**, **zero-row**, **non-emitting**, or **stale** evidence as 
 
 ### AVOID
 
+- **`name` in the Activator item create body** — Fabric item creation requires `displayName`; sending `{"name": ...}` fails with HTTP 400 `DisplayName field is required`. `name` is valid only **inside** `ReflexEntities.json` entity objects (rules, bindings, action arguments), never on the item envelope. See [Create — Request Body](#create--request-body)
+- **`targetItem` in a `fabricItemAction-v1` payload** — the target object is `payload.fabricItem` with `itemId`, `workspaceId` and `itemType` inside it. `targetItem` is not part of the schema; a rule built that way is accepted by `updateDefinition` but never resolves its target. `targetUniqueIdentifier` is a different thing and belongs to `parentContainer`. See [ReflexEntities.json — Assembly Procedure](#reflexentitiesjson--assembly-procedure), Step 6
+- **A cloned attribute that still selects the source attribute's field** — after copying a `BasicEventAttribute` entity, change the `EventFieldSelector` `fieldName` as well as the payload `name`. A `BatteryLevel` attribute whose `fieldName` is still `Temperature` is accepted by `updateDefinition` and silently reads the wrong column
+- **Two attribute entities with the same name** — the identity field already has an `IdentityPartAttribute`; adding a `BasicEventAttribute` of the same name makes `ScalarSelectStep` references ambiguous
 - **Hardcoded workspace or item IDs** — always resolve dynamically
 - **Forgetting the `.platform` part** — only include it with `updateDefinition` when using `?updateMetadata=true`
 - **SELECT * without filtering** on list endpoints — use pagination for large workspaces

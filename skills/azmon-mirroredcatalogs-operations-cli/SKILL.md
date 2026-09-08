@@ -1,6 +1,6 @@
 ---
 name: azmon-mirroredcatalogs-operations-cli
-description: "Onboard Azure Monitor / Application Insights observability data into Microsoft Fabric and guide business-impact insights by correlating telemetry with business data, Eventhouse external delta tables, verified schemas, an optional Real-Time (KQL) dashboard, and opt-in Operations Agent instructions. Triggers: onboard Azure Monitor into Fabric, correlate App Insights telemetry with business data, build a Real-Time KQL dashboard over telemetry, build an Operations Agent for business-impact alerting, determine if availability or latency impacted bookings orders or revenue, connect a Log Analytics workspace to Fabric."
+description: "Brings Azure Monitor, Application Insights, and Log Analytics telemetry into Fabric as Eventhouse external delta tables and correlates it with business data. Use to onboard observability data, judge whether latency or availability affected revenue, or build a Real-Time dashboard and Operations Agent over it."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

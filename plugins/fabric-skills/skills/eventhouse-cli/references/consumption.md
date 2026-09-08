@@ -3,61 +3,26 @@
 > **SCOPE BOUNDARY — READ-ONLY (mandatory)**
 > This mode may run read-only KQL queries and `.show` commands only. Do not
 > create, alter, ingest, drop, or otherwise mutate KQL objects. If the request
-> requires a write, announce the mode switch and read `authoring.md` before
-> issuing the first management command.
+> requires a write, announce the mode switch and load the authoring reference from
+> the `SKILL.md` index before issuing the first management command.
 
 # eventhouse-cli consumption mode — Read-Only KQL Queries via CLI
 
-## Table of Contents
+## Contents
 
-| Task | Reference | Notes |
-|---|---|---|
-| Finding Workspaces and Items in Fabric | [COMMON-CLI.md § Finding Workspaces and Items in Fabric](../../../common/COMMON-CLI.md#finding-workspaces-and-items-in-fabric) | **Mandatory** — *READ link first* [needed for finding workspace id by its name or item id by its name, item type, and workspace id] |
-| Fabric Topology & Key Concepts | [COMMON-CORE.md § Fabric Topology & Key Concepts](../../../common/COMMON-CORE.md#fabric-topology--key-concepts) | |
-| Environment URLs | [COMMON-CORE.md § Environment URLs](../../../common/COMMON-CORE.md#environment-urls) | KQL Cluster URI is per-item |
-| Authentication & Token Acquisition | [COMMON-CORE.md § Authentication & Token Acquisition](../../../common/COMMON-CORE.md#authentication--token-acquisition) | Wrong audience = 401; read before any auth issue |
-| Core Control-Plane REST APIs | [COMMON-CORE.md § Core Control-Plane REST APIs](../../../common/COMMON-CORE.md#core-control-plane-rest-apis) | |
-| Pagination | [COMMON-CORE.md § Pagination](../../../common/COMMON-CORE.md#pagination) | |
-| Long-Running Operations (LRO) | [COMMON-CORE.md § Long-Running Operations (LRO)](../../../common/COMMON-CORE.md#long-running-operations-lro) | |
-| Rate Limiting & Throttling | [COMMON-CORE.md § Rate Limiting & Throttling](../../../common/COMMON-CORE.md#rate-limiting--throttling) | |
-| OneLake Data Access | [COMMON-CORE.md § OneLake Data Access](../../../common/COMMON-CORE.md#onelake-data-access) | Requires `storage.azure.com` token, not Fabric token |
-| Job Execution | [COMMON-CORE.md § Job Execution](../../../common/COMMON-CORE.md#job-execution) | |
-| Capacity Management | [COMMON-CORE.md § Capacity Management](../../../common/COMMON-CORE.md#capacity-management) | |
-| Gotchas & Troubleshooting | [COMMON-CORE.md § Gotchas & Troubleshooting](../../../common/COMMON-CORE.md#gotchas--troubleshooting) | |
-| Best Practices | [COMMON-CORE.md § Best Practices](../../../common/COMMON-CORE.md#best-practices) | |
-| Tool Selection Rationale | [COMMON-CLI.md § Tool Selection Rationale](../../../common/COMMON-CLI.md#tool-selection-rationale) | |
-| Authentication Recipes | [COMMON-CLI.md § Authentication Recipes](../../../common/COMMON-CLI.md#authentication-recipes) | `az login` flows and token acquisition |
-| Fabric Control-Plane API via `az rest` | [COMMON-CLI.md § Fabric Control-Plane API via az rest](../../../common/COMMON-CLI.md#fabric-control-plane-api-via-az-rest) | **Always pass `--resource https://api.fabric.microsoft.com`** or `az rest` fails |
-| Pagination Pattern | [COMMON-CLI.md § Pagination Pattern](../../../common/COMMON-CLI.md#pagination-pattern) | |
-| Long-Running Operations (LRO) Pattern | [COMMON-CLI.md § Long-Running Operations (LRO) Pattern](../../../common/COMMON-CLI.md#long-running-operations-lro-pattern) | |
-| OneLake Data Access via `curl` | [COMMON-CLI.md § OneLake Data Access via curl](../../../common/COMMON-CLI.md#onelake-data-access-via-curl) | Use `curl` not `az rest` (different token audience) |
-| Job Execution (CLI) | [COMMON-CLI.md § Job Execution](../../../common/COMMON-CLI.md#job-execution) | |
-| OneLake Shortcuts | [COMMON-CLI.md § OneLake Shortcuts](../../../common/COMMON-CLI.md#onelake-shortcuts) | |
-| Capacity Management (CLI) | [COMMON-CLI.md § Capacity Management](../../../common/COMMON-CLI.md#capacity-management) | |
-| Composite Recipes | [COMMON-CLI.md § Composite Recipes](../../../common/COMMON-CLI.md#composite-recipes) | |
-| Gotchas & Troubleshooting (CLI-Specific) | [COMMON-CLI.md § Gotchas & Troubleshooting (CLI-Specific)](../../../common/COMMON-CLI.md#gotchas--troubleshooting-cli-specific) | `az rest` audience, shell escaping, token expiry |
-| Quick Reference: `az rest` Template | [COMMON-CLI.md § Quick Reference: az rest Template](../../../common/COMMON-CLI.md#quick-reference-az-rest-template) | |
-| Quick Reference: Token Audience / CLI Tool Matrix | [COMMON-CLI.md § Quick Reference: Token Audience ↔ CLI Tool Matrix](../../../common/COMMON-CLI.md#quick-reference-token-audience--cli-tool-matrix) | Which `--resource` + tool for each service |
-| Connection Fundamentals | [EVENTHOUSE-CONSUMPTION-CORE.md § Connection Fundamentals](../../../common/EVENTHOUSE-CONSUMPTION-CORE.md#connection-fundamentals) | Cluster URI discovery, `az rest`, REST API |
-| Schema Discovery and Security | [EVENTHOUSE-CONSUMPTION-CORE.md § Schema Discovery and Security](../../../common/EVENTHOUSE-CONSUMPTION-CORE.md#schema-discovery-and-security) | Schema Discovery, Security — workspace roles + KQL DB roles |
-| Monitoring and Diagnostics | [EVENTHOUSE-CONSUMPTION-CORE.md § Monitoring and Diagnostics](../../../common/EVENTHOUSE-CONSUMPTION-CORE.md#monitoring-and-diagnostics) | |
-| Performance Best Practices | [EVENTHOUSE-CONSUMPTION-CORE.md § Performance Best Practices](../../../common/EVENTHOUSE-CONSUMPTION-CORE.md#performance-best-practices) | **Read before writing KQL** — time filters, `has` vs `contains` |
-| Common Consumption Patterns | [EVENTHOUSE-CONSUMPTION-CORE.md § Common Consumption Patterns](../../../common/EVENTHOUSE-CONSUMPTION-CORE.md#common-consumption-patterns) | Time-series, Top-N, percentile, dynamic fields |
-| Gotchas, Troubleshooting, and Quick Reference | [EVENTHOUSE-CONSUMPTION-CORE.md § Gotchas, Troubleshooting, and Quick Reference](../../../common/EVENTHOUSE-CONSUMPTION-CORE.md#gotchas-troubleshooting-and-quick-reference) | Gotchas and Troubleshooting (12 issues), Quick Reference: Consumption Capabilities by Scenario |
-| Table and Column Discovery | [discovery-queries.md § Table and Column Discovery](consumption/discovery-queries.md#table-and-column-discovery) | Table Discovery, Column Statistics |
-| Function and View Discovery | [discovery-queries.md § Function and View Discovery](consumption/discovery-queries.md#function-and-view-discovery) | Function Discovery, Materialized View Discovery |
-| Policy Discovery | [discovery-queries.md § Policy Discovery](consumption/discovery-queries.md#policy-discovery) | |
-| External Tables and Ingestion Mappings | [discovery-queries.md § External Tables and Ingestion Mappings](consumption/discovery-queries.md#external-tables-and-ingestion-mappings) | External Table Discovery, Ingestion Mapping Discovery |
-| Security Discovery | [discovery-queries.md § Security Discovery](consumption/discovery-queries.md#security-discovery) | |
-| Database Overview Script | [discovery-queries.md § Database Overview Script](consumption/discovery-queries.md#database-overview-script) | |
-| Tool Stack | [SKILL.md § Tool Stack](#tool-stack) | |
-| Connection | [SKILL.md § Connection](#connection) | eventhouse-specific `az rest` connection steps |
-| Agentic Exploration ("Chat With My Data") | [SKILL.md § Agentic Exploration](#agentic-exploration) | **Start here** for data exploration |
-| Running Queries | [SKILL.md § Running Queries](#running-queries) | `az rest`, output formatting, export |
-| Monitoring | [SKILL.md § Monitoring](#monitoring) | |
-| Must / Prefer / Avoid / Troubleshooting | [SKILL.md § Must / Prefer / Avoid / Troubleshooting](#must--prefer--avoid--troubleshooting) | **MUST DO / AVOID / PREFER** checklists |
-| Examples | [SKILL.md § Examples](#examples) | |
-| Agent Integration Notes | [SKILL.md § Agent Integration Notes](#agent-integration-notes) | |
+- [Tool Stack](#tool-stack)
+- [Connection](#connection)
+- [Agentic Exploration](#agentic-exploration)
+- [Running Queries](#running-queries)
+- [Monitoring](#monitoring)
+- [Must / Prefer / Avoid / Troubleshooting](#must--prefer--avoid--troubleshooting)
+- [Examples](#examples)
+- [Agent Integration Notes](#agent-integration-notes)
+
+> Shared Fabric guidance (auth, pagination, LRO, gotchas) and the other references
+> for this skill are indexed in `SKILL.md`. Read them from there, not from here.
+
+---
 
 ---
 
@@ -102,9 +67,10 @@ DB_NAME="MyKqlDatabase"
 
 ```bash
 # Write body to temp file (avoids pipe escaping issues)
-cat > /tmp/kql_body.json << 'EOF'
-{"db":"MyKqlDatabase","csl":"print Message = 'Connected successfully', Cluster = current_cluster_endpoint(), Timestamp = now()"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+print Message = 'Connected successfully', Cluster = current_cluster_endpoint(), Timestamp = now()
+KQL
+jq -n --arg db "MyKqlDatabase" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 
 az rest --method POST \
   --url "${CLUSTER_URI}/v1/rest/query" \
@@ -154,9 +120,10 @@ AppEvents
 
 ```bash
 # Run a KQL query
-cat > /tmp/kql_body.json << 'EOF'
-{"db":"MyDB","csl":"Events | where Timestamp > ago(1h) | count"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+Events | where Timestamp > ago(1h) | count
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 
 az rest --method POST \
   --url "${CLUSTER_URI}/v1/rest/query" \
@@ -170,9 +137,10 @@ az rest --method POST \
 
 ```bash
 # Pretty-print results as a table with jq
-cat > /tmp/kql_body.json << 'EOF'
-{"db":"MyDB","csl":".show tables"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.show tables
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 
 az rest --method POST \
   --url "${CLUSTER_URI}/v1/rest/query" \
@@ -182,9 +150,10 @@ az rest --method POST \
   | jq '.Tables[0] | [.Columns[].ColumnName] as $cols | .Rows[] | [$cols, .] | transpose | map({(.[0]): .[1]}) | add'
 
 # Save results to file
-cat > /tmp/kql_body.json << 'EOF'
-{"db":"MyDB","csl":"Events | where Timestamp > ago(1h) | summarize count() by EventType"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+Events | where Timestamp > ago(1h) | summarize count() by EventType
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 
 az rest --method POST \
   --url "${CLUSTER_URI}/v1/rest/query" \
@@ -265,9 +234,10 @@ CLUSTER_URI="https://<your-cluster>.kusto.fabric.microsoft.com"
 DB_NAME="SalesDB"
 
 # 2. Discover tables
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB_NAME}","csl":".show tables"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.show tables
+KQL
+jq -n --arg db "${DB_NAME}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 az rest --method POST \
   --url "${CLUSTER_URI}/v1/rest/query" \
   --resource "https://kusto.kusto.windows.net" \
@@ -276,9 +246,10 @@ az rest --method POST \
   | jq '.Tables[0].Rows'
 
 # 3. Explore schema
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB_NAME}","csl":".show table Orders schema as json"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.show table Orders schema as json
+KQL
+jq -n --arg db "${DB_NAME}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 az rest --method POST \
   --url "${CLUSTER_URI}/v1/rest/query" \
   --resource "https://kusto.kusto.windows.net" \
@@ -287,9 +258,10 @@ az rest --method POST \
   | jq '.Tables[0].Rows'
 
 # 4. Sample data
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB_NAME}","csl":"Orders | take 10"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+Orders | take 10
+KQL
+jq -n --arg db "${DB_NAME}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 az rest --method POST \
   --url "${CLUSTER_URI}/v1/rest/query" \
   --resource "https://kusto.kusto.windows.net" \
@@ -325,9 +297,10 @@ orders
 
 ```bash
 # Run query and save results to JSON
-cat > /tmp/kql_body.json << 'EOF'
-{"db":"MyDB","csl":"Events | where Timestamp > ago(1d) | summarize count() by EventType"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+Events | where Timestamp > ago(1d) | summarize count() by EventType
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 
 az rest --method POST \
   --url "${CLUSTER_URI}/v1/rest/query" \

@@ -9,63 +9,25 @@
 
 # eventhouse-cli authoring mode — Eventhouse Authoring and Management via CLI
 
-## Table of Contents
+## Contents
 
-| Task | Reference | Notes |
-|---|---|---|
-| Finding Workspaces and Items in Fabric | [COMMON-CLI.md § Finding Workspaces and Items in Fabric](../../../common/COMMON-CLI.md#finding-workspaces-and-items-in-fabric) | **Mandatory** — *READ link first* [needed for workspace/item ID resolution] |
-| Fabric Topology & Key Concepts | [COMMON-CORE.md § Fabric Topology & Key Concepts](../../../common/COMMON-CORE.md#fabric-topology--key-concepts) | Hierarchy, Finding Things in Fabric |
-| Environment URLs | [COMMON-CORE.md § Environment URLs](../../../common/COMMON-CORE.md#environment-urls) | KQL Cluster URI, KQL Ingestion URI |
-| Authentication & Token Acquisition | [COMMON-CORE.md § Authentication & Token Acquisition](../../../common/COMMON-CORE.md#authentication--token-acquisition) | Wrong audience = 401; KQL audience: `kusto.kusto.windows.net` |
-| Core Control-Plane REST APIs | [COMMON-CORE.md § Core Control-Plane REST APIs](../../../common/COMMON-CORE.md#core-control-plane-rest-apis) | List Workspaces, List Items, Item Creation |
-| Pagination | [COMMON-CORE.md § Pagination](../../../common/COMMON-CORE.md#pagination) | |
-| Long-Running Operations (LRO) | [COMMON-CORE.md § Long-Running Operations (LRO)](../../../common/COMMON-CORE.md#long-running-operations-lro) | |
-| Rate Limiting & Throttling | [COMMON-CORE.md § Rate Limiting & Throttling](../../../common/COMMON-CORE.md#rate-limiting--throttling) | |
-| OneLake Data Access | [COMMON-CORE.md § OneLake Data Access](../../../common/COMMON-CORE.md#onelake-data-access) | Requires `storage.azure.com` token, not Fabric token |
-| Job Execution | [COMMON-CORE.md § Job Execution](../../../common/COMMON-CORE.md#job-execution) | |
-| Capacity Management | [COMMON-CORE.md § Capacity Management](../../../common/COMMON-CORE.md#capacity-management) | |
-| Gotchas & Troubleshooting | [COMMON-CORE.md § Gotchas & Troubleshooting](../../../common/COMMON-CORE.md#gotchas--troubleshooting) | |
-| Best Practices | [COMMON-CORE.md § Best Practices](../../../common/COMMON-CORE.md#best-practices) | |
-| Tool Selection Rationale | [COMMON-CLI.md § Tool Selection Rationale](../../../common/COMMON-CLI.md#tool-selection-rationale) | |
-| Authentication Recipes | [COMMON-CLI.md § Authentication Recipes](../../../common/COMMON-CLI.md#authentication-recipes) | `az login` flows and token acquisition |
-| Fabric Control-Plane API via `az rest` | [COMMON-CLI.md § Fabric Control-Plane API via az rest](../../../common/COMMON-CLI.md#fabric-control-plane-api-via-az-rest) | **Always pass `--resource https://api.fabric.microsoft.com`** or `az rest` fails |
-| Pagination Pattern | [COMMON-CLI.md § Pagination Pattern](../../../common/COMMON-CLI.md#pagination-pattern) | |
-| Long-Running Operations (LRO) Pattern | [COMMON-CLI.md § Long-Running Operations (LRO) Pattern](../../../common/COMMON-CLI.md#long-running-operations-lro-pattern) | |
-| OneLake Data Access via `curl` | [COMMON-CLI.md § OneLake Data Access via curl](../../../common/COMMON-CLI.md#onelake-data-access-via-curl) | Use `curl` not `az rest` (different token audience) |
-| SQL / TDS Data-Plane Access | [COMMON-CLI.md § SQL / TDS Data-Plane Access](../../../common/COMMON-CLI.md#sql--tds-data-plane-access) | `sqlcmd` (Go) — not for KQL, but useful for cross-workload |
-| Job Execution (CLI) | [COMMON-CLI.md § Job Execution](../../../common/COMMON-CLI.md#job-execution) | |
-| OneLake Shortcuts | [COMMON-CLI.md § OneLake Shortcuts](../../../common/COMMON-CLI.md#onelake-shortcuts) | |
-| Capacity Management (CLI) | [COMMON-CLI.md § Capacity Management](../../../common/COMMON-CLI.md#capacity-management) | |
-| Composite Recipes | [COMMON-CLI.md § Composite Recipes](../../../common/COMMON-CLI.md#composite-recipes) | |
-| Gotchas & Troubleshooting (CLI-Specific) | [COMMON-CLI.md § Gotchas & Troubleshooting (CLI-Specific)](../../../common/COMMON-CLI.md#gotchas--troubleshooting-cli-specific) | `az rest` audience, shell escaping, token expiry |
-| Quick Reference: `az rest` Template | [COMMON-CLI.md § Quick Reference: az rest Template](../../../common/COMMON-CLI.md#quick-reference-az-rest-template) | |
-| Quick Reference: Token Audience / CLI Tool Matrix | [COMMON-CLI.md § Quick Reference: Token Audience ↔ CLI Tool Matrix](../../../common/COMMON-CLI.md#quick-reference-token-audience--cli-tool-matrix) | Which `--resource` + tool for each service |
-| Authoring Capability Matrix | [EVENTHOUSE-AUTHORING-CORE.md § Authoring Capability Matrix](../../../common/EVENTHOUSE-AUTHORING-CORE.md#authoring-capability-matrix) | **Read first** — KQL Database vs Shortcut (read-only); connection requires Admin/Ingestor role |
-| Table Management and Schema Evolution | [EVENTHOUSE-AUTHORING-CORE.md § Table Management and Schema Evolution](../../../common/EVENTHOUSE-AUTHORING-CORE.md#table-management-and-schema-evolution) | Create Table, Create-Merge (idempotent), Alter / Rename / Drop, Schema Evolution (Rename, Swap/Blue-Green) |
-| Ingestion and Data Mappings | [EVENTHOUSE-AUTHORING-CORE.md § Ingestion and Data Mappings](../../../common/EVENTHOUSE-AUTHORING-CORE.md#ingestion-and-data-mappings) | Inline, Set-or-Append/Replace, From Storage, Streaming, Data Mappings (CSV, JSON) |
-| Policies | [EVENTHOUSE-AUTHORING-CORE.md § Policies](../../../common/EVENTHOUSE-AUTHORING-CORE.md#policies) | Retention, Caching, Partitioning, Merge |
-| Materialized Views | [EVENTHOUSE-AUTHORING-CORE.md § Materialized Views](../../../common/EVENTHOUSE-AUTHORING-CORE.md#materialized-views) | Create, Alter, Lifecycle, Supported aggregations |
-| Stored Functions and Update Policies | [EVENTHOUSE-AUTHORING-CORE.md § Stored Functions and Update Policies](../../../common/EVENTHOUSE-AUTHORING-CORE.md#stored-functions-and-update-policies) | Stored Functions, Update Policies (auto-transform on ingestion) |
-| External Tables | [EVENTHOUSE-AUTHORING-CORE.md § External Tables](../../../common/EVENTHOUSE-AUTHORING-CORE.md#external-tables) | OneLake / ADLS External Table, Query External Table |
-| Permission Model | [EVENTHOUSE-AUTHORING-CORE.md § Permission Model](../../../common/EVENTHOUSE-AUTHORING-CORE.md#permission-model) | Database Roles, Grant Permissions |
-| Authoring Gotchas and Troubleshooting | [EVENTHOUSE-AUTHORING-CORE.md § Authoring Gotchas and Troubleshooting Reference](../../../common/EVENTHOUSE-AUTHORING-CORE.md#authoring-gotchas-and-troubleshooting-reference) | 10 numbered issues with cause + fix |
-| Bash Templates | [authoring-script-templates.md § Bash Templates](authoring/authoring-script-templates.md#bash-templates) | Create Table + Ingest, Schema Deployment, Export Schema, Set Retention/Caching |
-| PowerShell Templates | [authoring-script-templates.md § PowerShell Templates](authoring/authoring-script-templates.md#powershell-templates) | Create Table + Ingest, Schema Deployment |
-| Tool Stack | [SKILL.md § Tool Stack](#tool-stack) | |
-| Connection | [SKILL.md § Connection](#connection) | |
-| Authoring Scope | [SKILL.md § Authoring Scope](#authoring-scope) | |
-| Execute KQL Command | [SKILL.md § Execute KQL Command](#execute-kql-command) | **`az rest` pattern** — write JSON body, then execute |
-| Table Management via CLI | [SKILL.md § Table Management via CLI](#table-management-via-cli) | Create Table, Add Column, Drop Table |
-| Data Ingestion via CLI | [SKILL.md § Data Ingestion via CLI](#data-ingestion-via-cli) | Inline, From Storage, From OneLake, Set-or-Append |
-| Policies via CLI | [SKILL.md § Policies via CLI](#policies-via-cli) | Retention, Caching, Streaming Ingestion |
-| Materialized Views via CLI | [SKILL.md § Materialized Views via CLI](#materialized-views-via-cli) | |
-| Functions and Update Policies via CLI | [SKILL.md § Functions and Update Policies via CLI](#functions-and-update-policies-via-cli) | Create Function, Create Update Policy |
-| Schema Evolution via CLI | [SKILL.md § Schema Evolution via CLI](#schema-evolution-via-cli) | Safe Schema Deployment Script, Export Current Schema |
-| Monitoring Authoring Operations | [SKILL.md § Monitoring Authoring Operations](#monitoring-authoring-operations) | |
-| Must / Prefer / Avoid / Troubleshooting | [SKILL.md § Must / Prefer / Avoid / Troubleshooting](#must--prefer--avoid--troubleshooting) | **MUST DO / AVOID / PREFER** checklists |
-| Agentic Workflows | [SKILL.md § Agentic Workflows](#agentic-workflows) | Exploration Before Authoring, Script Generation Workflow |
-| Examples | [SKILL.md § Examples](#examples) | |
-| Agent Integration Notes | [SKILL.md § Agent Integration Notes](#agent-integration-notes) | |
+- [Tool Stack](#tool-stack)
+- [Connection](#connection)
+- [Authoring Scope](#authoring-scope)
+- [Execute KQL Command](#execute-kql-command)
+- [Table Management via CLI](#table-management-via-cli)
+- [Data Ingestion via CLI](#data-ingestion-via-cli)
+- [Policies via CLI](#policies-via-cli)
+- [Advanced Operations](#advanced-operations)
+- [Must / Prefer / Avoid / Troubleshooting](#must--prefer--avoid--troubleshooting)
+- [Agentic Workflows](#agentic-workflows)
+- [Examples](#examples)
+- [Agent Integration Notes](#agent-integration-notes)
+
+> Shared Fabric guidance (auth, pagination, LRO, gotchas) and the other references
+> for this skill are indexed in `SKILL.md`. Read them from there, not from here.
+
+---
 
 ---
 
@@ -80,7 +42,7 @@
 
 ## Connection
 
-Use the same discovery flow as the [consumption mode](consumption.md#connection). Authoring requires elevated roles:
+Discovery is identical to consumption mode. Authoring requires elevated roles:
 
 ```bash
 # Discover KQL Database query URI
@@ -95,9 +57,11 @@ CLUSTER_URI="https://<cluster>.kusto.fabric.microsoft.com"
 DB_NAME="MyDatabase"
 
 # Verify admin access
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB_NAME}","csl":".show database ${DB_NAME} principals | where Role == 'Admin'"}
-EOF
+# Unquoted heredoc: the database name is interpolated into the command text itself.
+read -r -d '' CSL <<KQL || true
+.show database ${DB_NAME} principals | where Role == 'Admin'
+KQL
+jq -n --arg db "${DB_NAME}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 az rest --method POST \
   --url "${CLUSTER_URI}/v1/rest/mgmt" \
   --resource "https://kusto.kusto.windows.net" \
@@ -127,12 +91,18 @@ az rest --method POST \
 
 ## Execute KQL Command
 
-All KQL management commands in this skill follow the same `az rest` pattern. After setting `CLUSTER_URI` and `DB`, write the JSON body to `/tmp/kql_body.json` and execute:
+All KQL management commands in this skill follow the same `az rest` pattern. After setting `CLUSTER_URI` and `DB`:
 
 ```bash
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":"<KQL management command>"}
-EOF
+# A quoted heredoc keeps the command literal -- no shell expansion, and no
+# backslash-escaping even for policies and mappings that contain their own JSON.
+read -r -d '' CSL <<'KQL' || true
+<KQL management command>
+KQL
+
+# jq JSON-escapes the command; ${DB} still expands because it is passed as an argument.
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
+
 az rest --method POST \
   --url "${CLUSTER_URI}/v1/rest/mgmt" \
   --resource "https://kusto.kusto.windows.net" \
@@ -141,9 +111,11 @@ az rest --method POST \
   | jq '.Tables[0].Rows'
 ```
 
-> **Nested JSON** — For commands whose KQL contains embedded JSON (policies, mappings), use `<< 'EOF'` (single-quoted) to prevent shell expansion of backslash-escaped quotes, and replace `${DB}` with the literal database name.
+> **Never build the body by interpolating the command into a JSON string.** A KQL command that contains double quotes -- any ingestion mapping or policy document -- produces invalid JSON that `az rest` rejects. `jq -n --arg` handles the escaping, so no command needs special treatment and no database name needs hardcoding.
 
-> **PowerShell equivalent** — `@{db=$Database;csl=$Command} | ConvertTo-Json -Compress | Out-File $env:TEMP\kql_body.json -Encoding utf8NoBOM` then `--body "@$env:TEMP\kql_body.json"`. See [PowerShell Templates](authoring/authoring-script-templates.md#powershell-templates).
+> **Endpoint** — management commands go to `/v1/rest/mgmt`. That includes anything starting with `.`, such as `.show tables details | project ...`, even with a trailing pipe. Use `/v1/rest/query` only for expressions like `Events | count`.
+
+> **PowerShell equivalent** — `@{db=$Database;csl=$Command} | ConvertTo-Json -Compress` gives the same escaping guarantee. Check `$LASTEXITCODE` after every `az rest` call; a native-command failure does not stop PowerShell on its own. Ready-to-run scripts live in `scripts/`.
 
 ---
 
@@ -152,9 +124,10 @@ az rest --method POST \
 ### Create Table (Idempotent)
 
 ```bash
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".create-merge table Events (Timestamp: datetime, EventType: string, UserId: string, Properties: dynamic, Duration: real)"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.create-merge table Events (Timestamp: datetime, EventType: string, UserId: string, Properties: dynamic, Duration: real)
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
@@ -162,9 +135,10 @@ EOF
 ### Add Column
 
 ```bash
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".alter-merge table Events (Region: string)"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.alter-merge table Events (Region: string)
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
@@ -172,9 +146,10 @@ EOF
 ### Drop Table
 
 ```bash
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".drop table Events ifexists"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.drop table Events ifexists
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
@@ -186,9 +161,14 @@ EOF
 ### Inline Ingestion (Testing)
 
 ```bash
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".ingest inline into table Events <| 2025-01-15T10:00:00Z,Login,user1,{},0.5\n2025-01-15T10:01:00Z,Click,user2,{},0.2"}
-EOF
+# Real newlines after `<|`, not a literal \n: the heredoc keeps the text verbatim, so a
+# backslash-n would reach the server as two characters rather than a row separator.
+read -r -d '' CSL <<'KQL' || true
+.ingest inline into table Events <|
+2025-01-15T10:00:00Z,Login,user1,{},0.5
+2025-01-15T10:01:00Z,Click,user2,{},0.2
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
@@ -196,9 +176,10 @@ EOF
 ### Ingest from Storage
 
 ```bash
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".ingest into table Events (h'https://mystorage.blob.core.windows.net/data/events.csv.gz;impersonate') with (format='csv', ingestionMappingReference='EventsCsvMapping', ignoreFirstRecord=true)"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.ingest into table Events (h'https://mystorage.blob.core.windows.net/data/events.csv.gz;impersonate') with (format='csv', ingestionMappingReference='EventsCsvMapping', ignoreFirstRecord=true)
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
@@ -206,9 +187,10 @@ EOF
 ### Ingest from OneLake
 
 ```bash
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".ingest into table Events (h'abfss://workspace@onelake.dfs.fabric.microsoft.com/lakehouse.Lakehouse/Files/events.parquet;impersonate') with (format='parquet')"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.ingest into table Events (h'abfss://workspace@onelake.dfs.fabric.microsoft.com/lakehouse.Lakehouse/Files/events.parquet;impersonate') with (format='parquet')
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
@@ -216,9 +198,10 @@ EOF
 ### Set-or-Append from Query
 
 ```bash
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".set-or-append CleanEvents <| RawEvents | where IsValid == true | project Timestamp, EventType, UserId"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.set-or-append CleanEvents <| RawEvents | where IsValid == true | project Timestamp, EventType, UserId
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
@@ -231,9 +214,10 @@ EOF
 
 ```bash
 # Set 365-day retention
-cat > /tmp/kql_body.json << 'EOF'
-{"db":"MyDB","csl":".alter table Events policy retention '{\"SoftDeletePeriod\":\"365.00:00:00\",\"Recoverability\":\"Enabled\"}'"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.alter table Events policy retention '{"SoftDeletePeriod":"365.00:00:00","Recoverability":"Enabled"}'
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
@@ -242,9 +226,10 @@ EOF
 
 ```bash
 # Keep last 30 days in hot cache
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".alter table Events policy caching hot = 30d"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.alter table Events policy caching hot = 30d
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
@@ -252,125 +237,21 @@ EOF
 ### Streaming Ingestion
 
 ```bash
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".alter table Events policy streamingingestion enable"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.alter table Events policy streamingingestion enable
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
 
 ---
 
-## Materialized Views via CLI
+## Advanced Operations
 
-```bash
-# Create materialized view with backfill
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".create materialized-view with (backfill=true) HourlyEventCounts on table Events { Events | summarize Count = count(), LastSeen = max(Timestamp) by EventType, bin(Timestamp, 1h) }"}
-EOF
-```
-
-> Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
-
-```bash
-# Check health
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".show materialized-view HourlyEventCounts statistics"}
-EOF
-```
-
-> Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
-
----
-
-## Functions and Update Policies via CLI
-
-### Create Function
-
-```bash
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".create-or-alter function with (docstring='Parse raw events', folder='ETL') ParseRawEvents() { RawEvents | extend Parsed = parse_json(RawData) | project Timestamp = todatetime(Parsed.timestamp), EventType = tostring(Parsed.eventType), UserId = tostring(Parsed.userId) }"}
-EOF
-```
-
-> Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
-
-### Create Update Policy
-
-```bash
-cat > /tmp/kql_body.json << 'EOF'
-{"db":"MyDB","csl":".alter table ParsedEvents policy update @'[{\"IsEnabled\":true,\"Source\":\"RawEvents\",\"Query\":\"ParseRawEvents()\",\"IsTransactional\":true}]'"}
-EOF
-```
-
-> Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
-
----
-
-## Schema Evolution via CLI
-
-### Safe Schema Deployment Script
-
-Save management commands in a `.kql` file (one per line), then execute each command via `az rest`:
-
-```bash
-# deploy_schema.kql contains one command per line:
-# .create-merge table Events (Timestamp: datetime, EventType: string, UserId: string, Properties: dynamic)
-# .create-merge table ParsedEvents (Timestamp: datetime, EventType: string, UserId: string, PageName: string)
-# .alter table Events policy retention '{\"SoftDeletePeriod\":\"365.00:00:00\",\"Recoverability\":\"Enabled\"}'
-# .alter table Events policy caching hot = 30d
-
-# Execute each command from the file (see "Execute KQL Command" section)
-while IFS= read -r cmd; do
-  [[ "$cmd" =~ ^// ]] && continue   # skip comment lines
-  [[ -z "$cmd" ]] && continue        # skip blank lines
-  cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":"${cmd}"}
-EOF
-  az rest --method POST \
-    --url "${CLUSTER_URI}/v1/rest/mgmt" \
-    --resource "https://kusto.kusto.windows.net" \
-    --headers "Content-Type=application/json" \
-    --body @/tmp/kql_body.json \
-    | jq '.Tables[0].Rows'
-done < deploy_schema.kql
-```
-
-### Export Current Schema
-
-```bash
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".show database ${DB} schema as csl script"}
-EOF
-az rest --method POST \
-  --url "${CLUSTER_URI}/v1/rest/mgmt" \
-  --resource "https://kusto.kusto.windows.net" \
-  --headers "Content-Type=application/json" \
-  --body @/tmp/kql_body.json \
-  | jq -r '.Tables[0].Rows[][0]' > current_schema.kql
-```
-
----
-
-## Monitoring Authoring Operations
-
-```kql
-// Recent management commands
-.show commands
-| where StartedOn > ago(1h)
-| project StartedOn, CommandType, Text = substring(Text, 0, 100), State, Duration
-| order by StartedOn desc
-
-// Ingestion failures
-.show ingestion failures
-| where FailedOn > ago(24h)
-| summarize FailureCount = count() by ErrorCode, Table
-| order by FailureCount desc
-
-// Materialized view health
-.show materialized-views
-| project Name, IsEnabled, IsHealthy, MaterializedTo
-```
+Materialized views, stored functions, update policies, schema evolution and
+authoring-operation monitoring are out of scope for this file. `SKILL.md` routes to the
+reference that covers them.
 
 ---
 
@@ -451,36 +332,40 @@ Step 5 → Verify deployed state matches intent
 
 ```bash
 # Create table
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".create-merge table SensorData (Timestamp: datetime, DeviceId: string, Temperature: real, Humidity: real, Location: dynamic)"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.create-merge table SensorData (Timestamp: datetime, DeviceId: string, Temperature: real, Humidity: real, Location: dynamic)
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
 
 ```bash
 # Set retention
-cat > /tmp/kql_body.json << 'EOF'
-{"db":"MyDB","csl":".alter table SensorData policy retention '{\"SoftDeletePeriod\":\"90.00:00:00\",\"Recoverability\":\"Enabled\"}'"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.alter table SensorData policy retention '{"SoftDeletePeriod":"90.00:00:00","Recoverability":"Enabled"}'
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
 
 ```bash
 # Set caching
-cat > /tmp/kql_body.json << EOF
-{"db":"${DB}","csl":".alter table SensorData policy caching hot = 7d"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.alter table SensorData policy caching hot = 7d
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)
 
 ```bash
 # Create JSON mapping
-cat > /tmp/kql_body.json << 'EOF'
-{"db":"MyDB","csl":".create table SensorData ingestion json mapping 'SensorJsonMapping' '[{\"column\":\"Timestamp\",\"path\":\"$.ts\",\"datatype\":\"datetime\"},{\"column\":\"DeviceId\",\"path\":\"$.deviceId\",\"datatype\":\"string\"},{\"column\":\"Temperature\",\"path\":\"$.temp\",\"datatype\":\"real\"},{\"column\":\"Humidity\",\"path\":\"$.humidity\",\"datatype\":\"real\"},{\"column\":\"Location\",\"path\":\"$.location\",\"datatype\":\"dynamic\"}]'"}
-EOF
+read -r -d '' CSL <<'KQL' || true
+.create table SensorData ingestion json mapping 'SensorJsonMapping' '[{"column":"Timestamp","path":"$.ts","datatype":"datetime"},{"column":"DeviceId","path":"$.deviceId","datatype":"string"},{"column":"Temperature","path":"$.temp","datatype":"real"},{"column":"Humidity","path":"$.humidity","datatype":"real"},{"column":"Location","path":"$.location","datatype":"dynamic"}]'
+KQL
+jq -n --arg db "${DB}" --arg csl "${CSL}" '{db: $db, csl: $csl}' > /tmp/kql_body.json
 ```
 
 > Execute `/tmp/kql_body.json` — see [Execute KQL Command](#execute-kql-command)

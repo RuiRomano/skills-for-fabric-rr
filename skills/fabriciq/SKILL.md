@@ -1,14 +1,6 @@
 ---
 name: fabriciq
-description: >
-  Answer natural-language business questions over existing Power BI reports and semantic models through the FabricIQ MCP endpoint.
-  Orchestrates artifact discovery, schema inspection, entity resolution, DAX generation, and query execution to return plain-language answers.
-  Use when the user asks what, which, compare, rank, explain, or summarize questions about the data in a Power BI report or semantic model, including asking for a DAX query to be run against a named model.
-  Triggers: "ask power bi", "PBI question", "discover my Power BI report", "report data",
-  "dashboard data", "what are the top", "show me the power bi data",
-  "which products sold", "compare sales in report", "which customers churned",
-  "ask the Power BI report", "query a Power BI semantic model",
-  "run a DAX query against a semantic model".
+description: "Answers natural-language business questions over existing Power BI reports and semantic models through the FabricIQ MCP endpoint, discovering artifacts, resolving entities, generating the DAX itself, and returning a plain-language answer. Use when the user asks a data question, including one that says to query the model directly. For DAX the user supplies, or measures to save, use semantic-model-authoring."
 ---
 
 > **CRITICAL NOTES**

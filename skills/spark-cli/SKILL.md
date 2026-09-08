@@ -1,6 +1,6 @@
 ---
 name: spark-cli
-description: "Author, run and diagnose Fabric Spark: notebook cell code (%%configure, %%sql, PySpark, notebookutils), named notebook runs, Livy-session ad-hoc calculations, Spark failure triage, and the whole Materialized Lake View lifecycle -- definition, incremental-refresh readiness review, schedules, refresh jobs, run history and refresh-failure diagnosis. KQL materialized views are eventhouse-cli. Triggers:write notebook code,run notebook,notebookutils,create a Livy session,failed notebook,Spark OOM,create materialized lake view,schedule MLV,diagnose MLV refresh failure"
+description: "Manages Fabric Spark work, including notebook cell code with %%configure, %%sql, PySpark and notebookutils, named notebook runs, Livy sessions, triage of failed or OOM notebook and pipeline Spark runs, and the Materialized Lake View (MLV) lifecycle. Load it before writing MLV SQL, since CREATE MATERIALIZED LAKE VIEW and its CONSTRAINT clause are Fabric-only. KQL materialized views belong to eventhouse-cli."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

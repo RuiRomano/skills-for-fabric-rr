@@ -1,6 +1,6 @@
 ---
 name: sqldb-cli
-description: "Design, read and troubleshoot a Fabric SQL database item (OLTP, SQL Server engine): schema with constraints, indexes and vector columns; sqlcmd lookups including temporal and similarity search; Query Store, blocking and regressed-plan investigation. Warehouse items belong to sqldw-cli. Triggers:create sqldb table,sqldb foreign key,dacpac deploy,sqldb sys.tables,vector similarity sqldb,sqldb query store,sql database blocked sessions"
+description: "Manages a Fabric SQL database item, the OLTP SQL Server engine, including running T-SQL through sqlcmd, temporal and vector similarity search, schema and sys.tables inspection, dacpac deployment, and Query Store, blocked sessions and regressed-plan investigation. Use for any query or change against a SQL database item. Warehouse, lakehouse SQL endpoint and mirrored items belong to sqldw-cli."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

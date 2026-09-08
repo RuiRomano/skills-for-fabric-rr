@@ -1,6 +1,6 @@
 ---
 name: eventschemaset-cli
-description: "Author and inspect Microsoft Fabric Event Schema Sets (centralized catalogs of event types and message schemas) via the Fabric Items REST API with az rest: create, rename, override the definition or delete one; or list, inspect and base64-decode definitions read-only. Not the Eventstream ingestion pipeline (eventstream-*) nor Eventhouse/KQL (eventhouse-cli). Triggers:create event schema set,update event schema set definition,add event type to an event schema set,delete event schema set,list event schema sets,inspect event schema set,decode event schema set definition"
+description: "Governs Event Schema Sets, the Fabric registries of event types and message payload schemas. Covers create, rename, update and delete of a definition, and listing, property reads or base64 decoding. Every Event Schema Set task belongs here. Ingestion pipelines are eventstream-cli."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

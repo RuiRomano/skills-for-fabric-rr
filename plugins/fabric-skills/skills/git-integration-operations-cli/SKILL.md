@@ -1,18 +1,6 @@
 ---
 name: git-integration-operations-cli
-description: >
-  Automate the Microsoft Fabric Git integration lifecycle from CLI environments
-  using the Fabric CLI (fab api), with az rest as a fallback. Use when the user
-  wants to connect a workspace to Azure DevOps or GitHub, commit or update/pull
-  workspace items, check Git sync status, resolve update conflicts, disconnect,
-  automate Git sync with a service principal, or link a branch workspace to its
-  base. Do NOT use for branch switching, for deployment tools (fab deploy,
-  fabric-cicd, Bulk Import), for deployment-pipeline runtime, or for
-  cross-workspace reference rebinding after promotion (a property of the item
-  definition format, not the Git lifecycle). Triggers: "connect workspace to
-  git", "commit fabric to git", "update workspace from git", "fabric git
-  status", "resolve git conflict fabric", "service principal git sync", "link
-  branch to base".
+description: "Runs the Fabric Git integration lifecycle through fab api or az rest, including connecting a workspace to Azure DevOps or GitHub, committing, updating from Git, reading sync status, resolving conflicts, disconnecting a connected workspace, and automating sync with a service principal. For stage promotion use deployment-pipelines-authoring-cli. Branch switching, fab deploy, fabric-cicd and cross-workspace rebinding are out of scope."
 metadata:
   maturity: experimental
   owner: yaron
@@ -93,6 +81,7 @@ outside the repo):
 | Tenant admin prerequisites (switches) | [references/git-integration-concepts.md § Tenant admin prerequisites](references/git-integration-concepts.md#tenant-admin-prerequisites) |
 | Supported Git providers | [references/git-integration-concepts.md § Supported Git providers](references/git-integration-concepts.md#supported-git-providers) |
 | Supported item types | [references/git-integration-concepts.md § Supported item types](references/git-integration-concepts.md#supported-item-types) |
+| Avoiding formatting-only diffs (trailing newline / line endings) | [references/git-integration-concepts.md § Avoiding formatting-only diffs](references/git-integration-concepts.md#avoiding-formatting-only-diffs) |
 | Service principal / CI-CD pipeline templates | [references/automation-templates.md](references/automation-templates.md) |
 | Gotchas, Rules, Troubleshooting | [SKILL.md § Gotchas, Rules, Troubleshooting](#gotchas-rules-troubleshooting) |
 
@@ -598,6 +587,7 @@ parameterization it feeds.
 | `WorkspaceRelationRootDirectoryMismatch` on `git/workspaceRelations` | Base and branch workspaces are connected to different Git roots | Connect both to the SAME repo/org/project/directory (Azure DevOps) or repo URL/directory (GitHub), differing only by `branchName`, then retry |
 | `WorkspaceRelationAlreadyExists` / `WorkspaceRelationBidirectionalExists` | The base↔branch relation is already recorded (it is bidirectional) | Nothing to do — `GET git/workspaceRelations` to confirm; do not also create the reverse direction |
 | `WorkspaceRelationTypeNotBranch` on delete | Tried to delete a relation that is not a `Branch` relation | Only `Branch` relations are deletable — use the correct `workspaceRelationId` and delete from the branch side |
+| Every sync reports an uncommitted change you did not make (one removed blank line, or a CRLF/LF flip) | In affected workspaces, an editor or AI agent authored the item source (`notebook-content.py`, `pipeline-content.json`, `.platform`) with a trailing final newline or CRLF, then Fabric re-serialized it to the observed export form (LF, **no** trailing newline) | Confirm the behavior with a representative round trip, then match the observed export at authoring time: no trailing newline, LF endings. Pin it in the synced repo with `.editorconfig` + `.gitattributes`, and tell your AI agent not to add a final newline. See [git-integration-concepts.md § Avoiding formatting-only diffs](references/git-integration-concepts.md#avoiding-formatting-only-diffs) |
 
 ## Examples
 

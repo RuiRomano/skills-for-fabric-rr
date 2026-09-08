@@ -1,17 +1,6 @@
 ---
 name: e2e-fabric-cost-estimation
-description: >
-  Estimate Microsoft Fabric capacity costs before migration by analyzing existing workload
-  profiles (Spark, SQL, Power BI, Real-Time Intelligence) and recommending optimal SKU sizing,
-  billing modes, and Reserved Instance strategies. Use when the user wants to:
-  (1) estimate Fabric costs for a migration, (2) size a Fabric capacity SKU,
-  (3) compare Fabric pricing tiers, (4) calculate storage/compute/network costs,
-  (5) recommend Reserved vs. Pay-As-You-Go vs. Autoscale billing.
-  Trigger phrases are scoped to Fabric capacity cost/sizing to avoid over-routing on generic
-  cost, migration, or connection questions.
-  Triggers: "estimate fabric cost", "fabric capacity sizing", "fabric sku recommendation",
-  "fabric cost estimate", "fabric reserved instance", "fabric capacity pay-as-you-go",
-  "fabric autoscale billing".
+description: "Estimates Fabric capacity cost before a migration by profiling Spark, SQL, Power BI, and Real-Time workloads, then recommending SKU size and comparing Reserved, Pay-As-You-Go, and Autoscale billing. Use only for capacity sizing and pricing questions, not for general migration or connectivity work."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

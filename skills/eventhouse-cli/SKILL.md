@@ -1,6 +1,6 @@
 ---
 name: eventhouse-cli
-description: "Author and query Fabric Eventhouse / KQL databases: create tables, functions, policies, materialized views and ingestion, or run read-only KQL for real-time and time-series analytics. Ingestion topology is eventstream-cli. Triggers:kql query,query eventhouse,create kql table,kql ingestion,kql retention policy,materialized view kql"
+description: "Authors and queries Fabric Eventhouse and KQL databases: tables, functions, policies, materialized views, ingestion, and read-only KQL for real-time and time-series analytics. All KQL database work belongs here, table creation and simple queries included. An Eventstream item is eventstream-cli; an Event Schema Set is eventschemaset-cli."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry
@@ -30,6 +30,22 @@ It is a **mode dispatcher** and contains NO procedures. Pick the mode that match
 `consumption` may only issue read-only KQL and `.show` commands. Any dot-command that changes state (`.create`, `.alter`, `.ingest`, `.drop`, `.set-or-append`) requires the authoring mode: say so, read `references/authoring.md`, then proceed.
 
 If a request genuinely spans modes, handle them one at a time and read each reference before you start that part. If the mode is ambiguous after reading this table, ask one short clarifying question instead of guessing.
+
+## Reference index
+
+Read the mode reference first; open a topic file below only when the task needs it. Every
+reference is listed here, so read it from this table rather than following a link out of
+another reference.
+
+| Reference | Read it when |
+|---|---|
+| [references/authoring.md](references/authoring.md) | any `authoring` request -- start here |
+| [references/authoring-core.md](references/authoring-core.md) | you need the capability matrix, table/schema, ingestion, policy, external table or permission detail behind an authoring task |
+| [references/authoring-advanced-operations.md](references/authoring-advanced-operations.md) | materialized views, stored functions, update policies, schema evolution, or monitoring authoring operations |
+| [references/authoring-scripts.md](references/authoring-scripts.md) | you want a ready-to-run script for create-and-ingest, schema deployment, export or policies -- **run them from `scripts/`, do not read them** |
+| [references/consumption.md](references/consumption.md) | any `consumption` request -- start here |
+| [references/consumption-discovery-queries.md](references/consumption-discovery-queries.md) | you need the `.show` discovery queries for schema, tables or ingestion health |
+| [EVENTHOUSE-CONSUMPTION-CORE.md](../../common/EVENTHOUSE-CONSUMPTION-CORE.md) | connection fundamentals, schema discovery and security, monitoring, performance best practices, or common KQL query patterns -- **read before writing KQL** |
 
 ## Terminal write -- the step you must not skip
 

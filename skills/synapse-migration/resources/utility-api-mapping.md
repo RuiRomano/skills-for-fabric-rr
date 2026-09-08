@@ -97,7 +97,7 @@ result = notebookutils.notebook.run(
 | `mssparkutils.env.getWorkspaceName()` | `notebookutils.runtime.context["currentWorkspaceName"]` | |
 | `mssparkutils.env.getUserId()` | `notebookutils.runtime.context["userId"]` | |
 | `mssparkutils.env.getUserName()` | `notebookutils.runtime.context["userName"]` | |
-| `mssparkutils.env.getNotebookPath()` | `notebookutils.runtime.context["notebookPath"]` | |
+| `mssparkutils.env.getNotebookPath()` | No direct path equivalent; use `notebookutils.runtime.context["currentNotebookName"]` or `notebookutils.runtime.context["currentNotebookId"]` for notebook identity | Fabric runtime context does not expose a `notebookPath` key |
 
 ```python
 # Synapse
@@ -106,8 +106,8 @@ workspace = mssparkutils.env.getWorkspaceName()
 # Fabric
 ctx = notebookutils.runtime.context
 workspace = ctx["currentWorkspaceName"]
-notebook_path = ctx["notebookPath"]
-job_id = ctx["activityId"]
+notebook_name = ctx["currentNotebookName"]
+activity_id = ctx["activityId"]
 ```
 
 ---

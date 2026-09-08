@@ -147,6 +147,57 @@ v1).
 
 **Industry solutions**: Healthcare *(preview)*, Healthcare Cohort *(preview)*.
 
+## Avoiding formatting-only diffs
+
+In observed Fabric Git round trips, Fabric may re-serialize item source instead of
+preserving a byte-for-byte copy of the text in the repo. For affected item source
+files (such as `notebook-content.py`, `pipeline-content.json`, and `.platform`),
+the observed export uses **LF** line endings and **no trailing final newline**.
+This is operationally observed behavior, not a documented platform guarantee;
+verify it with a representative workspace commit before applying the workaround
+across a repository.
+
+This produces a common, harmless but annoying symptom. If an editor or an AI coding
+agent authors or edits those files **outside** Fabric and adds a trailing final
+newline (most editors do by default) or CRLF line endings, a later Fabric sync can
+re-serialize the file to the observed export form and the workspace can immediately
+report an **uncommitted change** you did not intend — a formatting-only diff,
+typically a single removed blank line. It is safe to commit, but it can recur on
+subsequent syncs.
+
+If a round-trip confirms this behavior, prevent recurrence by matching the observed
+export when the file is written:
+
+- **Do not append a trailing final newline, and do not use CRLF.** When an AI agent
+  generates Fabric item source, tell it to match the observed Fabric output — LF
+  line endings and no final newline — so a round-trip through Fabric is a no-op.
+- **Pin it in the synced repo** with `.editorconfig` and `.gitattributes`, so every
+  editor and every Git checkout stays consistent:
+
+```ini
+# .editorconfig — match the observed Fabric item serialization
+[**/{*.Notebook,*.DataPipeline,*.SparkJobDefinition}/**]
+end_of_line = lf
+insert_final_newline = false
+
+[**/.platform]
+end_of_line = lf
+insert_final_newline = false
+```
+
+```gitattributes
+# .gitattributes — normalize to LF so Git never churns on CRLF
+*.Notebook/**            text eol=lf
+*.DataPipeline/**        text eol=lf
+*.SparkJobDefinition/**  text eol=lf
+.platform                text eol=lf
+```
+
+This is a **file-level** workaround for the observed trailing-newline behavior.
+The [per-cell notebook rule](../../spark-authoring-cli/resources/notebook-api-operations.md)
+is separate and still applies: inside an `.ipynb` payload, every `source` line ends
+with `\n` **except** the last line of a cell.
+
 ## Provenance
 
 Distilled from Microsoft Learn:

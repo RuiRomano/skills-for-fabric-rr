@@ -1,6 +1,6 @@
 ---
 name: activator-cli
-description: "Create and inspect Fabric Activator (Reflex) alerts end to end: author rules, sources and actions, or decode an existing ReflexEntities definition read-only. Streaming topology is eventstream-cli. Triggers:create alert,notify me when,take action when,show my alerts,list activators,get reflex definition"
+description: "Creates and inspects Fabric Activator (Reflex) alerts: rules, their data sources, conditions, and the Teams or email action they fire, plus decoding an existing ReflexEntities definition. Choose it whenever someone wants to be told, or something done, when values cross a threshold. The pipeline delivering those values is eventstream-cli."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry
@@ -10,7 +10,7 @@ description: "Create and inspect Fabric Activator (Reflex) alerts end to end: au
 > **CRITICAL NOTES**
 > 1. To find the workspace details (including its ID) from workspace name: list all workspaces and, then, use JMESPath filtering
 > 2. To find the item details (including its ID) from workspace ID, item type, and item name: list all items of that type in that workspace and, then, use JMESPath filtering
-> 3. **Skill disambiguation**: use `activator-cli` for every Fabric Activator / Reflex item — both authoring alert rules and inspecting existing alerts. The streaming topology that feeds an alert belongs to `eventstream-authoring-cli` / `eventstream-consumption-cli`, the KQL database behind it to `eventhouse-authoring-cli` / `eventhouse-consumption-cli`, and Power BI report questions to `fabriciq`.
+> 3. **Skill disambiguation**: use `activator-cli` for every Fabric Activator / Reflex item — both authoring alert rules and inspecting existing alerts. The streaming topology that feeds an alert belongs to `eventstream-cli`, the KQL database behind it to `eventhouse-cli`, and Power BI report questions to `fabriciq`.
 
 # Fabric Activator (Reflex) — CLI Skill
 
@@ -102,7 +102,7 @@ Activator uses the `reflexes` collection, not the generic `items` collection: `/
 - Mutating anything while in the read-only `consumption` mode, including "just to check".
 - Hardcoded workspace or item ids in either mode — always resolve dynamically.
 - Globbing, listing or shell-searching the filesystem for the `common/` docs. They are optional background; if a link does not resolve, note it in one line and carry on.
-- Building the Eventstream topology that feeds an alert here; that is `eventstream-authoring-cli`. Querying the KQL data behind an alert is `eventhouse-consumption-cli`.
+- Building the Eventstream topology that feeds an alert here; that is `eventstream-cli`. Querying the KQL data behind an alert is `eventhouse-cli`.
 - Loading a different skill for work this skill already owns (see CRITICAL NOTES 3).
 
 ## Examples

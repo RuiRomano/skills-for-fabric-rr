@@ -1,15 +1,6 @@
 ---
 name: search-consumption-cli
-description: >
-  Search the Microsoft Fabric catalog across workspaces using the Fabric Catalog Search API.
-  Use when the user wants to: (1) find an item by display name when the workspace is unknown,
-  (2) list or discover items of a specific type across the tenant, (3) identify which workspace
-  contains an item, (4) return item/workspace IDs for downstream API calls. Dataflow Gen1/Gen2
-  items are not supported. For data queries after the item is known, use the workload-specific
-  consumption skill (`sqldw-cli`, `spark-cli`, `eventhouse-cli`, or `fabriciq`).
-  Triggers: "catalog search", "fabric catalog search", "catalog lookup",
-  "cross workspace catalog", "tenant catalog discovery", "tenant catalog inventory",
-  "tenant catalog identifiers", "workspace catalog discovery".
+description: "Finds Fabric items across every workspace with the Catalog Search API when the workspace is unknown, locating an item by display name, inventorying one item type tenant-wide, and returning the workspace and item IDs later calls need. Dataflow Gen1 and Gen2 items are not supported. Use only to locate items; once found, query them with the owning item skill such as sqldw-cli, spark-cli, eventhouse-cli or fabriciq."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

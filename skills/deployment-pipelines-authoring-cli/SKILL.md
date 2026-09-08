@@ -1,15 +1,6 @@
 ---
 name: deployment-pipelines-authoring-cli
-description: >
-  Automate Microsoft Fabric deployment pipelines (ALM promotion across dev/test/prod stages) via the
-  Fabric core REST API from agentic CLI environments. Use when the user wants to: (1) create or update a
-  deployment pipeline and its stages, (2) assign or unassign a workspace to a stage, (3) deploy content
-  from one stage to the next (forward or backward) including selective item deploys, (4) track a deployment
-  as a long-running operation, (5) manage deployment pipeline role assignments. Triggers:
-  "create deployment pipeline", "deploy to test stage", "promote workspace to production",
-  "assign workspace to deployment pipeline stage", "deploy stage content", "check deployment status",
-  "list deployment pipeline operations", "Fabric ALM promote dev to prod",
-  "what permissions/roles are required to assign a workspace or deploy stage content".
+description: "Manages Fabric deployment pipelines for ALM promotion across dev, test, and prod stages, including stage creation, workspace assignment, selective forward or backward deploys, operation polling, stage role assignments, and the pipeline and workspace permissions each action requires. For Git sync use git-integration-operations-cli."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

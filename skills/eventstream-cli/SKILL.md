@@ -1,6 +1,6 @@
 ---
 name: eventstream-cli
-description: "Build and inspect Fabric Eventstream topologies: sources, operators, destinations and stream routing, plus read-only topology, retention, throughput and connection-string inspection. Querying landed events uses eventhouse-cli consumption mode. Triggers:create eventstream,add filter operator,CDC source,inspect eventstream topology,eventstream retention,list eventstreams"
+description: "Owns Fabric Eventstream items end to end: sources, operators, destinations, routing, retention, throughput and connection strings, plus read-only topology checks. Pick it for anything that names an Eventstream, creating and listing included. Where the rows finally land is eventhouse-cli."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

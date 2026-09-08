@@ -1,13 +1,6 @@
 ---
 name: e2e-medallion-architecture
-description: >
-  Plan and implement end-to-end Microsoft Fabric data platforms and Medallion Architecture (Bronze/Silver/Gold)
-  lakehouse patterns using PySpark, Delta Lake, Lakehouse/Warehouse items, Fabric Pipelines, and semantic-model handoff.
-  Use for multi-layer workspaces, ingestion-to-analytics pipelines, Bronze-to-Silver-to-Gold notebook orchestration,
-  layer-specific Fabric Spark tuning, and Materialized Lake View versus notebook decisions for Silver and Gold.
-  For natural-language questions over existing Power BI report data, use `fabriciq`.
-  Triggers: "medallion architecture", "bronze silver gold", "lakehouse layers", "e2e data pipeline",
-  "end-to-end Fabric data platform", "medallion Spark tuning", "Silver Gold MLV or notebooks".
+description: "Plans and builds end-to-end Fabric data platforms on the Bronze, Silver, and Gold medallion pattern: ingestion to analytics, PySpark and Delta layers, pipeline orchestration, per-layer Spark tuning, Materialized Lake View versus notebook choices for Silver and Gold, and Direct Lake handoff. Use for layered architecture design, planning and recommendations. For questions over an existing Power BI report use fabriciq."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

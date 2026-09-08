@@ -1,19 +1,6 @@
 ---
 name: pipeline-migration
-description: >
-  Migrate Synapse Data Factory pipeline artifacts to Microsoft Fabric Data Factory.
-  Handles: linked services → Fabric connections, dataset definitions inlined into
-  pipeline activities, global parameters → Variable Libraries, SynapseNotebook
-  activities → TridentNotebook. SSIS, SHIR-only, and Databricks activities are parked.
-  Use when: (1) migrating Synapse pipelines to Fabric Data Factory,
-  (2) converting SynapseNotebook activities to TridentNotebook,
-  (3) translating linked services to Fabric connections,
-  (4) converting global parameters to Fabric Variable Libraries,
-  (5) inlining dataset definitions into Fabric pipeline activities.
-  Triggers: "synapse pipeline to fabric", "data factory pipeline migration",
-  "tridentnotebook pipeline activity", "global parameters to variable library",
-  "linked service to fabric connection", "inline dataset fabric pipeline",
-  "pipeline migration from synapse".
+description: "Migrates Synapse Data Factory pipelines to Fabric Data Factory, turning linked services into Fabric connections, inlining datasets into activities, converting global parameters to Variable Libraries, and mapping SynapseNotebook to TridentNotebook. Use for pipeline JSON. For Synapse Spark notebook code use synapse-migration."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

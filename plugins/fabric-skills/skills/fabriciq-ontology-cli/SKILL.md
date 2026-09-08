@@ -1,6 +1,6 @@
 ---
 name: fabriciq-ontology-cli
-description: "Author and explore Fabric IQ Ontology items: entity and relationship types, data bindings and definition updates, or schema, lineage, grounding and graph-walk exploration. Power BI report Q&A is fabriciq. Triggers:create ontology item,bind entity type,update ontology definition,entity types,ground query,ontology lineage"
+description: "Manages Fabric IQ Ontology items, including entity and relationship types, data bindings, and definition updates, plus schema, lineage, grounding, and graph-walk exploration. Use for ontology modelling and traversal. For natural-language questions over a Power BI report use fabriciq."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

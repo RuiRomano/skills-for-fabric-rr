@@ -2,7 +2,68 @@
 
 User-facing changes for the public Microsoft Fabric Skills release.
 
-## [Unreleased]
+## [0.3.15] - 2026-09-04
+
+
+### Added
+- **`skills/sqldw-cli`** -- added a read-only Capacity Metrics workflow that discovers the installed metrics model, adapts to timestamped or fixed-window schema variants, identifies costly Warehouse and Lakehouse SQL endpoint items, and analyzes every Query Insights request overlapping the Capacity Metrics spike range. Results keep fixed-window capacity health separate from broader item history, disclose timeframe and 30-day Query Insights limits, and treat SQL statement candidates as best-effort correlation because Capacity Metrics Operation Id and Query Insights `distributed_statement_id` are different identifiers.
+- **`onelake-catalog-govern-cli`** -- audits and safely remediates Microsoft Fabric OneLake catalog governance across domains, workspaces, capacities, protection, and curation, with separate permission-aware modes for tenant admins and data owners.
+
+### Changed
+- **`skills/sqldw-cli`** -- expanded composite diagnostics for failed and canceled requests, SQL pool pressure, resource concentration, Lakehouse table health, performance regressions, optimization targets, and user/application activity. Custom SQL pool guidance now uses recurring historical contention and stable application classifiers rather than converting Capacity Metrics CU seconds or Query Insights CPU milliseconds into pool percentages.
+- **`skills/sqldw-cli`** -- made operations follow-ups user-facing: results now turn evidence into concrete actions on the investigated workload, SQL item, capacity, or correlation report, while retaining timezone, retention, lag, and confidence caveats as limitations rather than skill-development suggestions.
+
+### Fixed
+- **`skills/sqldw-cli`** -- corrected pressure intervals to use the complete pool-state event stream and exact pool matching, included canceled requests in non-success analysis, limited Lakehouse health checks to Lakehouse SQL analytics endpoints, and stopped recommending result-set caching while the feature is unavailable.
+- **`skills/sqldw-cli`** -- retained command-less and legitimate Query Insights-referencing requests in historical custom-pool profiles, excluding only agent-labeled diagnostics, and widened duration and CPU aggregation to `bigint`.
+- **`semantic-model-authoring`** -- preserves existing Prep data for AI configuration during unrelated semantic model edits and uses the Power BI modeling MCP for read-only metadata discovery when available.
+- `synapse-migration` now handles Dedicated SQL Pool DACPAC and zipped SQL-project schema and code migrations more reliably, validates generated Spark SQL, safely resumes interrupted operations, and isolates concurrent migrations across multiple datamarts.
+
+## [0.3.14] - 2026-08-26
+
+
+### Added
+- **`databricks-migration`** -- added a guided four-phase workflow for inventorying, preparing, migrating, validating, and cutting over Databricks workloads to Fabric.
+- **`databricks-migration`** -- added post-migration checks for environments, schemas, row counts, notebook and job execution, output comparison, and validation reporting.
+- **`databricks-migration`** -- added troubleshooting guidance for common migration issues involving DLT, namespaces, widgets, Photon, DBFS, streaming, init scripts, and Git integration.
+
+### Changed
+- **Skill descriptions rewritten so the assistant picks the right one more often.** Every skill now states plainly what it owns, what it can do, when to choose it, and which neighbouring skill owns the work next door. Previously several skills described their area only in general terms, so a request that sat between two of them could reach the wrong skill -- or none at all, with the assistant answering from general knowledge instead. Requests that name a specific Fabric item or operation now land on the skill that owns it.
+
+- **The full skill catalog fits comfortably within what the assistant reads at startup.** Only each skill's name and description are loaded up front, and that space is limited. The catalog previously ran close enough to the limit that adding skills risked pushing later ones past it -- and a skill past the limit is known only by its name, so the assistant can no longer tell what it does and chooses between skills on the name alone. The descriptions are now about 40% shorter with no loss of routing accuracy, leaving room for the catalog to grow.
+- **`databricks-migration`** -- expanded migration planning with Blocker, Warning, and Info severity levels, accurate Scala and SparkR compatibility guidance, schema-enabled Lakehouse mapping, and structured failure reporting.
+- **`semantic-model-authoring`** -- enable the `fabric-skills` bundle to use the hosted Power BI modeling service for semantic model authoring, while the `powerbi-authoring` bundle continues to support the local modeling server.
+
+### Fixed
+- **Seven skills regained the exact words people type.** The description rewrite favoured readable prose and, in doing so, dropped the literal tokens a request actually matches on: `MLV` and `OOM` (`spark-cli`), `count rows` and `SELECT` (`sqldw-cli`), `dacpac` and `sys.tables` (`sqldb-cli`), `executeQuery` and `saveAsNativeArtifact` (`dataflows-cli`), `libraryVariables` and `notebookutils` (`variable-library-cli`), and the `Gen1`/`Gen2` "not supported" caveat (`search-consumption-cli`). `git-integration-operations-cli` also lost its exclusions, so a question about `fabric-cicd` or branch switching could be captured by a skill that cannot help -- worse than a miss, because the answer sounds confident. Prose reads better to a reviewer; literals are what match a user's words. All seven are back, every description still inside the 450-character cap, for 361 characters against roughly 3,850 of bundle headroom.
+
+- **`variable-library-cli`'s description was not a grammatical sentence.** "…and valueSets overrides, which consumers can reference a variable and with what syntax across pipelines…" -- a malformed clause in the one field the router reads. Rewritten, and `libraryVariables` and `notebookutils variableLibrary` restored with it.
+
+- **`activator-cli`, `sqldw-cli` and `variable-library-cli`** -- these skills pointed you at skills that no longer exist. Their guidance still referred to `eventstream-authoring-cli`, `eventhouse-consumption-cli`, `spark-authoring-cli` and the separate `sqldb-authoring-cli` / `sqldb-consumption-cli` / `sqldb-operations-cli` skills, all of which were merged into single per-item skills in earlier releases. Handing work to a name that is not installed left the request stranded. They now name the current skills: `eventstream-cli`, `eventhouse-cli`, `spark-cli` and `sqldb-cli`.
+
+- **`sqldb-cli`** -- "run a query against my Fabric SQL database" reached the Warehouse skill instead. `sqldb-cli` presented itself as a design-and-troubleshoot skill and never claimed plain querying, so the Warehouse skill won on the word "query". It now leads with querying a SQL database item, so the request reaches the right engine.
+
+- **Git integration, deployment pipelines, Spark, Variable Library and Fabric IQ** -- several common requests reached the wrong skill or none at all: disconnecting a workspace from Git, asking which permissions or roles a deployment-pipeline stage needs, creating a materialized lake view, asking what a Variable Library value resolves to for a given release, and querying Fabric IQ directly. Each of these now names the case explicitly, so the request reaches the skill that handles it.
+- **`databricks-migration`** -- corrected Databricks inventory commands, schema-enabled Lakehouse creation, Maven and JAR library handling, Environment definition paths, notebook export, Spark Job Definition deployment, job execution URLs, Spark version validation, and cancelled-versus-timed-out run handling.
+
+## [0.3.13] - 2026-08-20
+
+
+### Added
+- **`skills/git-integration-operations-cli`** -- guidance for avoiding formatting-only diffs on Git sync. Fabric re-serializes item source (`notebook-content.py`, `pipeline-content.json`, `.platform`) to its canonical form (LF, no trailing final newline) on export, so an editor or AI agent that adds a trailing newline or CRLF causes every sync to report a spurious uncommitted change. Adds a troubleshooting-table row plus a "Avoiding formatting-only diffs" reference section with `.editorconfig` / `.gitattributes` snippets to pin the synced repo, and links the separate per-cell notebook newline rule in `spark-authoring-cli`.
+- **`synapse-migration`** -- add a source-driven workflow for migrating Synapse Dedicated SQL Pool schema and executable code artifacts to Fabric Lakehouse, including discovery, gap assessment, T-SQL to readable Spark SQL `%%sql` notebook conversion, deployment, and validation. Stored-procedure notebooks reject PySpark/DataFrame conversions and source-only placeholders. Source table-row migration remains explicitly out of scope.
+- **`synapse-migration`** -- make the gap report feature-wise and risk-driven, with support level, likelihood, impact, risk rationale, target pattern, and explicit `1:0`/`1:1`/`1:N`/`N:1`/`N:M`/`Deferred` cardinality. Target artifacts are generated only from approved designs; one source object is no longer assumed to equal one Lakehouse artifact.
+- **`synapse-migration`** -- assess discovered procedure volume against projected Fabric workspace item usage, then require the user to provide and approve a `1:1`, `N:1`, or `N:N` notebook mapping, target names, and workspace placement before conversion begins.
+
+### Fixed
+- **`activator-cli`** -- creating an Activator item no longer fails with `HTTP 400 DisplayName field is required`. The authoring reference documented the create endpoint without a request body, and every rule, binding, data source and action argument in an Activator definition legitimately uses a `name` key, so `name` was easily carried over to the item itself by mistake. The Item CRUD section now includes a complete create request showing `displayName`, a callout explaining that `displayName` identifies the item while `name` belongs only inside the definition entities, and a matching entry in the AVOID list.
+- **`activator-cli`** -- the authoring reference now shows the `fabricItemAction-v1` request payload inline at the assembly step that builds it, with the target carried in `payload.fabricItem` (`itemId`, `workspaceId`, `itemType`) and the supported `itemType` / `jobType` pairs listed, plus an AVOID entry for the invalid `targetItem` shape. The key was previously documented only in the delegated per-target reference, so a rule authored several steps after that file was read could invoke an item action that `updateDefinition` accepts but that never resolves its target.
+- **`activator-cli`** -- the create request example now sends `--headers "Content-Type=application/json"` and carries a PowerShell variant that writes the body to `$env:TEMP` and passes it with `--body "@<file>"`. The section previously showed only a bash example with inline single-quoted JSON, so a PowerShell run failed twice before recovering -- once with `UnsupportedMediaType` for the missing content type, then with `InvalidInput` / `Unexpected character encountered while parsing value` when the shell mangled the inline JSON. The prose caveat pointing at the AVOID entry was not enough on its own, since the worked example is what gets copied.
+- **`activator-cli`** -- the attribute assembly step now states that each attribute entity covers one source field and needs a unique name, that the identity field is already covered by its `IdentityPartAttribute`, and that cloning an attribute requires updating the `EventFieldSelector` `fieldName` as well as the payload `name`. Two matching AVOID entries were added. A cloned attribute that still selects the original field is accepted by `updateDefinition` and silently reads the wrong column.
+- **`synapse-migration`** -- publish generated stored-procedure notebooks with externally overridable parameters, bounded status polling, clear failure reporting, persisted-definition readback, Lakehouse-binding checks, collision-safe idempotency, per-object approval states, and artifact-level validation.
+- **`synapse-migration`** -- preserve stored-procedure input behavior by keeping supported inputs externally overridable, retaining exact source defaults only as `%%configure` fallbacks, blocking invented defaults, and rejecting generated SQL that replaces parameters with hardcoded literals or constant preview views.
+- **`synapse-migration`** -- preserve each `1:1` stored-procedure `sourceName` as the generated notebook filename and Fabric display name, while retaining complete per-procedure traceability for approved decomposed or shared notebooks.
+- **`synapse-migration`** -- make large stored-procedure migrations fully traceable and reproducible while preserving audit and logging behavior, retrying only failed conversion work, and validating complete source coverage before deployment.
 
 ## [0.3.12] - 2026-08-13
 

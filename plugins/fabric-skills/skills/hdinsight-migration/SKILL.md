@@ -1,20 +1,6 @@
 ---
 name: hdinsight-migration
-description: >
-  Port Azure HDInsight Spark clusters and Hive workloads to Microsoft Fabric.
-  Replaces legacy HiveContext and standalone SparkContext constructors with
-  the pre-instantiated SparkSession. Converts WASB and ABFS storage paths to OneLake
-  abfss URLs via Shortcuts. Transforms Hive DDL (STORED AS ORC, external tables) to
-  Delta Lake schemas inside Fabric Lakehouse. Maps Oozie workflow actions — spark, hive,
-  shell, sqoop, coordinator — to Fabric Pipeline activities and schedule triggers.
-  Introduces notebookutils for file and credential operations previously handled via
-  subprocess or HDFS client calls. Use when the user wants to:
-  (1) retire an HDInsight cluster and move to Fabric,
-  (2) convert WASB paths or Hive DDL,
-  (3) replace Oozie coordinators with Fabric Pipelines.
-  Triggers: "migrate from hdinsight", "hdi to fabric", "hivecontext sparksession fabric",
-  "wasb to onelake", "hive ddl to delta", "oozie to fabric pipelines",
-  "migrate an oozie action", "hive metastore lakehouse", "hdinsight spark migration".
+description: "Ports HDInsight Spark and Hive workloads to Fabric, converting HiveContext and SparkContext to SparkSession, WASB and ABFS paths to OneLake shortcuts, Hive DDL to Delta tables in a Lakehouse, and Oozie coordinators and actions to pipeline activities and triggers. Use when the source workload is HDInsight."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

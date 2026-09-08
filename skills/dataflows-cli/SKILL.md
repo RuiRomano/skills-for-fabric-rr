@@ -1,6 +1,6 @@
 ---
 name: dataflows-cli
-description: "Author, inspect and upgrade Fabric Dataflow Gen2: connection and output setup, M preview via executeQuery, saved definition and refresh-history inspection, and Gen1-to-Gen2 save-as upgrades. Pipeline JSON is pipeline-migration. Triggers:executeQuery preview,updateDefinition,getDefinition,dataflow refresh history,saveAsNativeArtifact,Gen1 Gen2 readiness"
+description: "Manages Fabric Dataflow Gen2 items, including creation, M editing, connections, output destinations, getDefinition and updateDefinition inspection, executeQuery, refresh history, and Gen1-to-Gen2 save-as upgrades via saveAsNativeArtifact. Use for Dataflow items or Power Query M definitions. For pipeline JSON use pipeline-migration; for Spark or Warehouse transformations use their own skills."
 ---
 
 > **Telemetry — MANDATORY.** Every `api.fabric.microsoft.com` call must carry

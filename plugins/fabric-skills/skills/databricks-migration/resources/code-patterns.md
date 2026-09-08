@@ -146,7 +146,7 @@ orders    = spark.read.table("prod.silver.orders")
 result    = customers.join(orders, "customer_id")
 result.write.format("delta").mode("overwrite").saveAsTable("prod.gold.customer_orders")
 
-# AFTER — Fabric: 2-level (catalog removed; Lakehouse context provides catalog)
+# AFTER — Fabric: the attached Lakehouse represents the source catalog
 customers = spark.read.table("silver.customers")
 orders    = spark.read.table("silver.orders")
 result    = customers.join(orders, "customer_id")
