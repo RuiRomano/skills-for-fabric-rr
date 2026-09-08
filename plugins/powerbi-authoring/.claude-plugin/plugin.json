@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "powerbi-authoring",
   "description": "Developer skills for authoring Microsoft Power BI solutions.",
-  "version": "0.3.15",
+  "version": "0.3.16",
   "license": "MIT",
   "repository": "https://github.com/microsoft/skills-for-fabric",
   "keywords": [
@@ -25,7 +25,7 @@
   ],
   "agents": [],
   "mcpServers": {
-    "powerbi-modeling-mcp": {
+    "powerbi-authoring-local": {
       "type": "stdio",
       "command": "npx",
       "args": [
